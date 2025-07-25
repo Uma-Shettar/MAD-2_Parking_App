@@ -47,24 +47,18 @@ class ParkingLot(db.Model):
         return f'<ParkingLot {self.prime_location_name}>'
 
 class ParkingSpot(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     lot_id = db.Column(db.Integer, db.ForeignKey('parking_lot.id'), nullable=False)
-    spot_number = db.Column(db.String(20), nullable=False) # e.g., A1, B2, 1, 2
     status = db.Column(db.String(1), default='A', nullable=False) # 'A' for Available, 'O' for Occupied
 
-    # Ensure uniqueness of spot_number within a given parking_lot
-    __table_args__ = (db.UniqueConstraint('lot_id', 'spot_number', name='_lot_spot_uc'),)
-
     reservations = db.relationship('Reservation', backref='parking_spot', lazy=True)
-
-    def __repr__(self):
-        return f'<ParkingSpot {self.spot_number} (Lot: {self.lot_id}) - {self.status}>'
 
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     spot_id = db.Column(db.Integer, db.ForeignKey('parking_spot.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    parking_timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    vehicle_number = db.Column(db.String(20), nullable=False)
+    parking_timestamp = db.Column(db.DateTime, nullable=False)
     leaving_timestamp = db.Column(db.DateTime, nullable=True) 
     cost_per_hour = db.Column(db.Float, nullable=False) 
 

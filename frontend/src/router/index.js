@@ -29,6 +29,31 @@ const router = createRouter({
       name: 'register',
       component: () => import('../views/RegisterView.vue'),
     },
+    {
+      path:'/lots',
+      name:'lots-list',
+      component: () => import('../views/AddlotView.vue')
+    },
+    {
+      path:'/lots/:lot_id',
+      name:'lots',
+      component: () => import('../views/EditlotView.vue')
+    },
+    {
+      path:'/spots/:spot_id',
+      name:'spots',
+      component: () => import('../views/Viewspot.vue')
+    },
+    {
+      path:'/spotdetails/:spot_id',
+      name:'spotsdetails',
+      component: () => import('../views/Viewspotdetails.vue')
+    },
+    {
+      path: '/users',
+      name: 'users',
+      component: () => import('../views/users.vue')
+    }
 
   ],
 })

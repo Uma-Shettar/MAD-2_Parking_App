@@ -7,6 +7,8 @@ from controllers.database import db
 from controllers.config import Config
 from controllers.userdatastore import user_datastore
 from flask_cors import CORS
+from controllers.authentication import Login, Logout, Register
+from controllers.routes import Add_Lot, Lot_Management, viewspots, viewspotdetails, users
 
 def create_app():
     app = Flask(__name__)
@@ -16,6 +18,15 @@ def create_app():
     security = Security(app, user_datastore)
 
     api = Api(app, prefix='/api')
+
+    api.add_resource(Add_Lot, '/lots')
+    api.add_resource(Lot_Management, '/lots/<int:lot_id>')
+    api.add_resource(Login, '/login')
+    api.add_resource(Logout, '/logout')
+    api.add_resource(Register, '/register')
+    api.add_resource(viewspots, '/spots/<int:spot_id>')
+    api.add_resource(viewspotdetails, '/spotdetails/<int:spot_id>')
+    api.add_resource(users, '/users')
 
     with app.app_context():
         db.create_all()
@@ -31,12 +42,10 @@ def create_app():
     return app, api
 
 app, api = create_app()
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, origins=["http://localhost:5173"], supports_credentials=True, allow_headers=['Content-Type', 'Authentication-Token'])
 
-from controllers.authentication import Login, Logout, Register
-api.add_resource(Login, '/login')
-api.add_resource(Logout, '/logout')
-api.add_resource(Register, '/register')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

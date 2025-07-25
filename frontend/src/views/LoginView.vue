@@ -29,6 +29,9 @@
 
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { AuthStore } from '@/stores/authentication';
+
+const authStore = AuthStore();
 
 const router = useRouter();
 
@@ -89,9 +92,9 @@ async function Login() {
     }
     else {
         const data = await response.json();
-        console.log(data);
-        localStorage.setItem('token', data.user.auth_token);
-        alert(data.message);
+        authStore.setCred(data.user.auth_token, data.user);
+        alert('Login successful');
+        console.log(localStorage.getItem('token'));
         if (data.user.roles.includes('admin')) {
             router.push('/admin-dashboard');
         } 

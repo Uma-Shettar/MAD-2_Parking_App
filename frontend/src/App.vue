@@ -29,7 +29,7 @@ async function logout() {
           <RouterLink class="nav-link active" aria-current="page" to="/register"style="font-size: 18px;">Register</RouterLink>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#"style="font-size: 18px;">Users</a>
+          <RouterLink class="nav-link active" aria-current="page" to="/users" style="font-size: 18px;">Users</RouterLink>
         </li>
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#"style="font-size: 18px;"> Parking Records</a>
