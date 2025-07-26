@@ -1,13 +1,18 @@
 from flask_restful import Resource
-from flask import request, jsonify, make_response
-from flask_security import auth_token_required, utils, roles_required
+from flask import request, jsonify, make_response, g
+from flask_security import auth_token_required, utils, roles_required, current_user
 from controllers.database import db, ParkingLot, ParkingSpot, Reservation, User
+from pytz import timezone
+from datetime import datetime
+import pytz
 
 from controllers.userdatastore import user_datastore
 
+def get_time():
+    return datetime.now(timezone('Asia/Kolkata'))
+
 class Add_Lot(Resource):
     @auth_token_required
-    @roles_required('admin')
     def get(self):
         lots = ParkingLot.query.all()
         result = []
@@ -25,6 +30,7 @@ class Add_Lot(Resource):
                 'address': lot.address,
                 'pin_code': lot.pin_code,
                 'total_spots': lot.total_spots,
+                'spots_count':ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count(),
                 'spots': spots
             })
 
@@ -223,4 +229,123 @@ class users(Resource):
                 'frequency': frequency
             })
         return make_response(jsonify(result), 200)
+
+class Reservationdata(Resource):
+    @auth_token_required
+    @roles_required('user')
+    def get(self):
+        user_id = current_user.id
+        reservations = Reservation.query.filter_by(user_id=user_id).all()
+        result = []
+        for reservation in reservations:
+            result.append({
+                'id': reservation.id,
+                'lot_name': reservation.parking_spot.parking_lot.prime_location_name,
+                'user_id': reservation.user_id,
+                'spot_id': reservation.spot_id,
+                'parking_timestamp': reservation.parking_timestamp,
+                'leaving_timestamp': reservation.leaving_timestamp,
+                'vehicle_number': reservation.vehicle_number,
+                'cost_per_hour': reservation.cost_per_hour
+            })
+        return make_response(jsonify(result), 200)
+
+class user_search(Resource):
+    @auth_token_required
+    @roles_required('user')
+    def get(self, search,search_type):
+        if search_type == 'location':
+            lots = ParkingLot.query.filter_by(address=search).all()
+        elif search_type == 'pincode':
+            lots = ParkingLot.query.filter_by(pin_code=search).all()
+        else:
+            lots = ParkingLot.query.all()
+        result = []
+        for lot in lots:
+            result.append({
+                'id': lot.id,
+                'address': lot.address,
+                'spots_count': ParkingSpot.query.filter_by(lot_id=lot.id, status='A').count()
+                
+            })
+        return make_response(jsonify(result), 200)
+
+    
+class release(Resource):
+    @auth_token_required
+    @roles_required('user')
+    def post(self,reservation_id):
+        reservation = Reservation.query.get_or_404(reservation_id)
+        if reservation is None:
+            return make_response(jsonify({'message': 'Reservation not found'}), 404)
+        if reservation.leaving_timestamp is not None:
+            return make_response(jsonify({'message': 'Spot is not reserved'}), 400)
+        spot = ParkingSpot.query.get_or_404(reservation.spot_id)
+        if spot is None:
+            return make_response(jsonify({'message': 'Spot not found'}), 404)
+        reservation.leaving_timestamp = get_time()
+        spot.status = 'A'
+        db.session.commit()
+        return make_response(jsonify({'message': 'Spot released successfully'}), 200)
+    
+    @auth_token_required
+    @roles_required('user')
+    def get(self,reservation_id):
+        ist = pytz.timezone('Asia/Kolkata')
+        reservation = Reservation.query.get_or_404(reservation_id)
+        if reservation is None:
+            return make_response(jsonify({'message': 'Reservation not found'}), 404)
+        duration = (get_time() - ist.localize(reservation.parking_timestamp)).total_seconds()/3600
+        total_cost = round(reservation.cost_per_hour * duration,2)
+        result = {
+            'id': reservation.id,
+            'user_id': reservation.user_id,
+            'spot_id': reservation.spot_id,
+            'parking_timestamp': reservation.parking_timestamp,
+            'vehicle_number': reservation.vehicle_number,
+            'cost_per_hour': reservation.cost_per_hour,
+            'duration': duration,
+            'total_cost': total_cost
+        }
+        return make_response(jsonify(result), 200)
+
         
+class book(Resource):
+    @auth_token_required
+    @roles_required('user')
+    def post(self,lot_id):
+
+        lot = ParkingLot.query.get_or_404(lot_id)
+        if lot is None:
+            return make_response(jsonify({'message': 'Lot not found'}), 404)
+        spot = ParkingSpot.query.filter_by(lot_id=lot_id, status='A').first()
+        if spot is None:
+            return make_response(jsonify({'message': 'No available spots'}), 400)
+        data = request.get_json()
+
+        reservation = Reservation(
+            user_id = current_user.id,
+            spot_id=spot.id,
+            parking_timestamp=get_time(),
+            vehicle_number=request.json.get('vehicle_number'), 
+            cost_per_hour=lot.price_per_hour
+            )
+        db.session.add(reservation)
+        spot.status = 'O'
+        db.session.commit()
+        return make_response(jsonify({'message': 'Spot reserved successfully'}), 200)
+    
+class spotbook(Resource):
+    @auth_token_required
+    @roles_required('user')
+    def get(self,lot_id):
+        lot = ParkingLot.query.get_or_404(lot_id)
+        spot = ParkingSpot.query.filter_by(lot_id=lot_id, status='A').first()
+        if spot is None:
+            return make_response(jsonify({'message': 'No available spots'}), 400)
+        result = {
+            'spot_id': spot.id,
+            'status': spot.status,
+            'user_id': current_user.id
+        }
+        return make_response(jsonify(result), 200)

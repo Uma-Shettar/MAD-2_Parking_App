@@ -53,6 +53,16 @@ const router = createRouter({
       path: '/users',
       name: 'users',
       component: () => import('../views/users.vue')
+    },
+    {
+      path: '/book/:lot_id',
+      name: 'book',
+      component: () => import('../views/Bookspot.vue')
+    },
+    {
+      path: '/release/:reservation_id',
+      name: 'release',
+      component: () => import('../views/Releasespot.vue')
     }
 
   ],
