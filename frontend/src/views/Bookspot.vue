@@ -19,7 +19,7 @@
                 <input type="text" class="form-control" id="vehicleNumber" name="vehicle_number" v-model="vehicle_number">
             </div>
             <div>
-                <button type="submit" class="btn btn-primary"@click="Bookspot"> Reserve</button>
+                <button type="submit" class="btn btn-primary"> Reserve</button>
                 <button type="reset" class="btn btn-secondary" @click="router.push('/user-dashboard')">Cancel</button>
             </div>
         </form>

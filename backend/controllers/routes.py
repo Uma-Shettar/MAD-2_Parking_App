@@ -349,3 +349,35 @@ class spotbook(Resource):
             'user_id': current_user.id
         }
         return make_response(jsonify(result), 200)
+    
+class records(Resource):
+    @auth_token_required
+    @roles_required('admin')
+    def get(self):
+        ist = pytz.timezone('Asia/Kolkata')
+        reservations = Reservation.query.all()
+        result = []
+        for reservation in reservations:
+            if not reservation.leaving_timestamp:
+                status = 'Active'
+            else:
+                duration = round((ist.localize(reservation.leaving_timestamp) - ist.localize(reservation.parking_timestamp)).total_seconds()/3600,2)
+                total_cost = round(reservation.cost_per_hour * duration,2)
+                status = 'Completed'
+            result.append({
+                'id': reservation.id,
+                'user_id': reservation.user_id,
+                'spot_id': reservation.spot_id,
+                'parking_timestamp': reservation.parking_timestamp,
+                'leaving_timestamp': reservation.leaving_timestamp,
+                'duration': duration,
+                'total_cost': total_cost,
+                'vehicle_number': reservation.vehicle_number,
+                'cost_per_hour': reservation.cost_per_hour,
+                'name': reservation.user.name,
+                'prime_location_name': reservation.parking_spot.parking_lot.prime_location_name,
+                'status': status
+            })
+            duration = None
+            total_cost = None
+        return make_response(jsonify(result), 200)

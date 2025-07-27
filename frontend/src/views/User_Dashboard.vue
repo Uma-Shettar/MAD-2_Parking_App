@@ -32,6 +32,7 @@
                             <td>{{ CalculatedDuration(reservation.parking_timestamp, reservation.leaving_timestamp) }}</td>
                             <td>
                                 <a class="btn btn-outline-primary" v-if="reservation.leaving_timestamp == None" @click="Release(reservation.id)" role="button" > Release </a>
+                                <a class="btn btn-outline-primary" v-else role="button" @click="Viewdetails(reservation.id)" > View Details </a>
                             </td>
                         </tr>
                     </tbody>
@@ -153,9 +154,7 @@ const SearchLot = async () => {
         router.push('/login');
         return;
     }
-    search.value = document.querySelector('input[name="search"]').value;
-    search_type.value = document.querySelector('select[name="search_type"]').value;
-
+    
     try {
         if (search.value === '' || search_type.value === '') {
             const response = await fetch('http://127.0.0.1:5000/api/lots', {
@@ -199,6 +198,20 @@ const Release = async (id) => {
 const Book = async (id) => {
     router.push(`/book/${id}`);
     console.log(`Book lot with ID: ${id}`);
+};
+
+const Viewdetails = (id) => {
+    alert(
+    `         COST BREAKDOWN
+    
+    cost per hour : ${reservations.value[id].cost_per_hour}
+    Parking Date : ${formatDate(reservations.value[id].parking_timestamp)}
+    Parking Time : ${formatTime(reservations.value[id].parking_timestamp)}
+    Leaving Date : ${formatDate(reservations.value[id].leaving_timestamp)}
+    Leaving Time : ${formatTime(reservations.value[id].leaving_timestamp)}
+    Duration : ${CalculatedDuration(reservations.value[id].parking_timestamp, reservations.value[id].leaving_timestamp)} hours
+    Total Cost : ${CalculatedDuration(reservations.value[id].parking_timestamp, reservations.value[id].leaving_timestamp) * reservations.value[id].cost_per_hour} Rupees`
+    );
 };
 
 </script>

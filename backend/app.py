@@ -8,7 +8,7 @@ from controllers.config import Config
 from controllers.userdatastore import user_datastore
 from flask_cors import CORS
 from controllers.authentication import Login, Logout, Register
-from controllers.routes import Add_Lot, Lot_Management, viewspots, viewspotdetails, users, Reservationdata, user_search, book, spotbook, release
+from controllers.routes import *
 
 def create_app():
     app = Flask(__name__)
@@ -32,6 +32,7 @@ def create_app():
     api.add_resource(book, '/bookspot/<int:lot_id>')
     api.add_resource(spotbook, '/book/<int:lot_id>')
     api.add_resource(release, '/release/<int:reservation_id>')
+    api.add_resource(records, '/parkingrecords')
 
     with app.app_context():
         db.create_all()

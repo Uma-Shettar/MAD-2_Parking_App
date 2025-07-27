@@ -63,6 +63,11 @@ const router = createRouter({
       path: '/release/:reservation_id',
       name: 'release',
       component: () => import('../views/Releasespot.vue')
+    },
+    {
+      path: '/parkingrecords',
+      name: 'parkingrecords',
+      component: () => import('../views/Parkingrecords.vue')
     }
 
   ],

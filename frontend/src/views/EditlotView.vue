@@ -122,7 +122,6 @@ const edit_Lot = async () => {
 };
 
 onMounted(() => {
-    console.log('EditlotView route params:', route.params);
     lotId.value = route.params.lot_id;
     if (lotId.value) {
         fetchLotDetails();

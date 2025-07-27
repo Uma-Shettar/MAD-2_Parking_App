@@ -76,21 +76,6 @@ export const AuthStore = defineStore('authentication', () => {
     }
   }
 
-  function get_user_id() {
-    if (user.value && user.value.id) {
-      return user.value.id;
-    } else {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        user.value = JSON.parse(storedUser);
-        return user.value.id;
-      }
-      console.error('Error passing user id data');
-      return null;
-    }
-  }
-
-
 
   return { token, user, isAuthenticated, setCred, clearToken, get_name, get_email, get_authtoken, get_roles};
 }   );
