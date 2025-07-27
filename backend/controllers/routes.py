@@ -206,11 +206,18 @@ class viewspotdetails(Resource):
 
         if spot is None:
             return make_response(jsonify({'message': 'Spot not found'}), 404)
+        
+        reservation = Reservation.query.filter_by(spot_id=spot_id).first()
         result = {
-            'id': spot.id,
-            'status': spot.status,
-            'reservations': [reservation.to_dict() for reservation in spot.reservations],
-        }
+            'id': reservation.id,
+            'user_id': reservation.user_id,
+            'spot_id': reservation.spot_id,
+            'vehicle_number': reservation.vehicle_number,
+            'parking_timestamp': reservation.parking_timestamp,
+            'leaving_timestamp': reservation.leaving_timestamp,
+            'cost_per_hour': reservation.cost_per_hour,
+            }
+
         return make_response(jsonify(result), 200)
     
 class users(Resource):
@@ -380,4 +387,87 @@ class records(Resource):
             })
             duration = None
             total_cost = None
+        return make_response(jsonify(result), 200)
+    
+
+class adminchart(Resource):
+    @auth_token_required
+    @roles_required('admin')
+    def get(self):
+        ist = pytz.timezone('Asia/Kolkata')
+        lots = ParkingLot.query.all()
+        lot_revenue_data = []
+        lot_reservations_data = []
+
+        for lot in lots:
+            reservations_count = 0
+            revenue = 0
+
+            if lot.parking_spots:
+                for spot in lot.parking_spots:
+                    if spot.reservations:
+                        for reservation in spot.reservations:
+                            reservations_count += 1
+                            if reservation.leaving_timestamp is None:
+                                continue
+                            duration = round((ist.localize(reservation.leaving_timestamp) - ist.localize(reservation.parking_timestamp)).total_seconds()/3600,2)
+                            total_cost = round(reservation.cost_per_hour * duration,2)
+                            revenue += total_cost
+
+            lot_revenue_data.append({
+                'label': lot.prime_location_name,
+                'value': revenue
+            })
+
+            lot_reservations_data.append({
+                'label': lot.prime_location_name,
+                'value': reservations_count
+            })
+
+        result = {
+            'lot_revenue_data': lot_revenue_data,
+            'lot_reservations_data': lot_reservations_data
+        }
+        return make_response(jsonify(result), 200)
+    
+class userchart(Resource):
+    @auth_token_required
+    @roles_required('user')
+    def get(self):
+        ist = pytz.timezone('Asia/Kolkata')
+        user = User.query.get_or_404(current_user.id)
+        lots = ParkingLot.query.all()
+        lot_revenue_data = []
+        lot_reservations_data = []
+        for lot in lots:
+            reservations_count = 0
+            revenue = 0
+
+            if lot.parking_spots:
+                for spot in lot.parking_spots:
+                    if spot.reservations:
+                        for reservation in spot.reservations:
+                            if reservation.user_id == user.id:
+                                reservations_count += 1
+                                if reservation.leaving_timestamp is None:
+                                    duration = round((get_time() - ist.localize(reservation.parking_timestamp)).total_seconds()/3600,2)
+                                else:
+                                    duration = round((ist.localize(reservation.leaving_timestamp) - ist.localize(reservation.parking_timestamp)).total_seconds()/3600,2)
+                                total_cost = round(reservation.cost_per_hour * duration,2)
+                                revenue += total_cost
+
+            lot_revenue_data.append({
+                'label': lot.prime_location_name,
+                'value': revenue
+            })
+
+            lot_reservations_data.append({
+                'label': lot.prime_location_name,
+                'value': reservations_count
+            })
+
+        result = {
+            'lot_revenue_data': lot_revenue_data,
+            'lot_reservations_data': lot_reservations_data
+        }
         return make_response(jsonify(result), 200)

@@ -8,11 +8,11 @@
             </div>
             <div class="mb-3">
             <label for="customer_id" class="form-label">Customer Id</label>
-                <input type="text" class="form-control" id="customer_id" name="customer_id" v-model="spot.reservation.user_id" readonly>
+                <input type="text" class="form-control" id="customer_id" name="customer_id" v-model="spot.user_id" readonly>
             </div>
             <div class="mb-3">
                 <label for="vehicle_number" class="form-label">Vehicle Number</label>
-                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" v-model="spot.reservation.vehicle_number" readonly>
+                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" v-model="spot.vehicle_number" readonly>
             </div>
             <div class="mb-3">
                 <label for="reservation_timestamp" class="form-label">Date and Time of Reservation</label>
@@ -44,25 +44,22 @@ const route = useRoute();
 
 const spot_id = ref('');
 const spot = ref({
-    id: '',
-    reservation: {
-        user_id: '',
-        vehicle_number: '',
-        parking_timestamp: '',
-        leaving_timestamp: '',
-        cost_per_hour: ''
-    }
+    user_id: '',
+    vehicle_number: '',
+    parking_timestamp: '',
+    leaving_timestamp: '',
+    cost_per_hour: ''
 });
 
 const fparking_timestamp = computed(() => {
-    if (spot.value.reservation.parking_timestamp)
-        return new Date(spot.value.reservation.parking_timestamp).toLocaleString();
+    if (spot.value.parking_timestamp)
+        return new Date(spot.value.parking_timestamp).toLocaleString();
     return '';
 });
 
 const estimated_parking_cost = computed(() => {
-    const parkingtime = spot.value.reservation.parking_timestamp;
-    const price_per_hour = spot.value.reservation.cost_per_hour;
+    const parkingtime = spot.value.parking_timestamp;
+    const price_per_hour = spot.value.cost_per_hour;
 
     if (parkingtime && price_per_hour > 0) {
         try {
@@ -112,7 +109,12 @@ const fetchSpotDetails = async () => {
             console.error('Failed to fetch spot details');
         }
         const data = await response.json();
-        spot.value = data;
+        spot.value.id = data.id;
+        spot.value.user_id = data.user_id;
+        spot.value.vehicle_number = data.vehicle_number;
+        spot.value.parking_timestamp = data.parking_timestamp;
+        spot.value.leaving_timestamp = data.leaving_timestamp;
+        spot.value.cost_per_hour = data.cost_per_hour;
     } catch (error) {
         console.error('Error fetching spot details:', error);
     }

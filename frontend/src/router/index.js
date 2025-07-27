@@ -68,7 +68,17 @@ const router = createRouter({
       path: '/parkingrecords',
       name: 'parkingrecords',
       component: () => import('../views/Parkingrecords.vue')
-    }
+    },
+    {
+      path: '/adminchart',
+      name: 'adminchart',
+      component: () => import('../views/AdminChart.vue')
+    },
+    {
+      path: '/userchart',
+      name: 'userchart',
+      component: () => import('../views/UserChart.vue')
+    },
 
   ],
 })

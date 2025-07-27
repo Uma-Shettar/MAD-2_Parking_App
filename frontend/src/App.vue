@@ -48,6 +48,12 @@ async function logout() {
         <li class="nav-item" v-if="AuthStore().get_roles() == 'admin'">
           <RouterLink class="nav-link active" aria-current="page" to="/parkingrecords" style="font-size: 18px;"> Parking Records</RouterLink>
         </li>
+        <li class="nav-item" v-if="AuthStore().get_roles() == 'admin'">
+          <RouterLink class="nav-link active" aria-current="page" to="/adminchart" style="font-size: 18px;"> Summary </RouterLink>
+        </li>
+        <li class="nav-item" v-if="AuthStore().get_roles() == 'user'">
+          <RouterLink class="nav-link active" aria-current="page" to="/userchart" style="font-size: 18px;"> Summary </RouterLink>
+        </li>
         <li class="nav-item" v-if="AuthStore().get_authtoken()">
           <a class="nav-link active" aria-current="page" @click="logout" style="font-size: 18px;">Logout</a>
         </li>

@@ -33,6 +33,8 @@ def create_app():
     api.add_resource(spotbook, '/book/<int:lot_id>')
     api.add_resource(release, '/release/<int:reservation_id>')
     api.add_resource(records, '/parkingrecords')
+    api.add_resource(adminchart, '/adminchart')
+    api.add_resource(userchart, '/userchart')
 
     with app.app_context():
         db.create_all()

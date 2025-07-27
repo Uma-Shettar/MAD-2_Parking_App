@@ -115,7 +115,7 @@ onMounted(() => {
 });
 
 const Viewdetails = (id) => {
-    router.push(`/spotsdetails/${id}`);
+    router.push(`/spotdetails/${id}`);
 };
 
 
