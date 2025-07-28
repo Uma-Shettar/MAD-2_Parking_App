@@ -1,5 +1,5 @@
 <template>
-    <div><h1 class = "text-center" style="color: #07567d;">Edit Lot</h1></div>
+    <div><h1 class = "text-center" style="color: #07567d;">Release Spot</h1></div>
     <div class="container-fluid row justify-content-center">
         <form class="col-5" @submit.prevent="ReleaseSpot">
             <div class="mb-3">
@@ -24,7 +24,7 @@
             </div>
             <div>
                 <button type="submit" class="btn btn-primary" >Release</button>
-                <button type="reset" class="btn btn-secondary" @click="router.push('/user-dashboard')">Cancel</button>
+                <a class="btn btn-outline-primary m-1" @click="router.push('/user-dashboard')" role="View">Cancel</a>
             </div>
         </form>
     </div>

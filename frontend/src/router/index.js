@@ -79,6 +79,11 @@ const router = createRouter({
       name: 'userchart',
       component: () => import('../views/UserChart.vue')
     },
+    {
+      path: '/adminsearch/:search/:search_type',
+      name: 'adminsearch',
+      component: () => import('../views/AdminSearch.vue')
+    }
 
   ],
 })

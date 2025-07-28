@@ -4,19 +4,19 @@
         <form class="col-5" @submit.prevent>
             <div class="mb-3">
                 <label for="spot_id" class="form-label">Spot Id</label>
-                <input type="text" class="form-control" id="spot_id" name="spot_id" v-model="spot.id" readonly>
+                <input type="text" class="form-control" id="spot_id" name="spot_id" v-model="spot_id" readonly>
             </div>
             <div class="mb-3">
             <label for="customer_id" class="form-label">Customer Id</label>
-                <input type="text" class="form-control" id="customer_id" name="customer_id" v-model="spot.user_id" readonly>
+                <input type="text" class="form-control" id="customer_id" name="customer_id" v-model="user_id" readonly>
             </div>
             <div class="mb-3">
                 <label for="vehicle_number" class="form-label">Vehicle Number</label>
-                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" v-model="spot.vehicle_number" readonly>
+                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" v-model="vehicle_number" readonly>
             </div>
             <div class="mb-3">
                 <label for="reservation_timestamp" class="form-label">Date and Time of Reservation</label>
-                <input type="text" class="form-control" id="reservation_timestamp" name="reservation_timestamp" v-model="fparking_timestamp" readonly>
+                <input type="text" class="form-control" id="reservation_timestamp" name="reservation_timestamp" v-model ="formated_parking_timestamp" readonly>
             </div>
             <div class="mb-3">
                 <label for="estimated_parking_cost" class="form-label">Estimated Parking Cost</label>
@@ -43,28 +43,28 @@ const router = useRouter();
 const route = useRoute();
 
 const spot_id = ref('');
-const spot = ref({
-    user_id: '',
-    vehicle_number: '',
-    parking_timestamp: '',
-    leaving_timestamp: '',
-    cost_per_hour: ''
-});
+const user_id = ref('');
+const vehicle_number = ref('');
+const parking_timestamp = ref('');
+const cost_per_hour = ref('');
 
-const fparking_timestamp = computed(() => {
-    if (spot.value.parking_timestamp)
-        return new Date(spot.value.parking_timestamp).toLocaleString();
-    return '';
+const formated_parking_timestamp = computed(() => {
+    return parking_timestamp.value ? new Date(parking_timestamp.value).toLocaleString('en-GB', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).replace(',', '') : 'Loading...';
 });
 
 const estimated_parking_cost = computed(() => {
-    const parkingtime = spot.value.parking_timestamp;
-    const price_per_hour = spot.value.cost_per_hour;
+    const parkingtime = parking_timestamp.value;
+    const price_per_hour = cost_per_hour.value;
 
     if (parkingtime && price_per_hour > 0) {
         try {
             const start = new Date(parkingtime);
+            console.log(start);
             const end = new Date();
+            console.log(end);
             const diff = end - start;
             const hours = Math.ceil(diff / (1000 * 60 * 60));
             return (hours * price_per_hour).toFixed(2);
@@ -109,12 +109,10 @@ const fetchSpotDetails = async () => {
             console.error('Failed to fetch spot details');
         }
         const data = await response.json();
-        spot.value.id = data.id;
-        spot.value.user_id = data.user_id;
-        spot.value.vehicle_number = data.vehicle_number;
-        spot.value.parking_timestamp = data.parking_timestamp;
-        spot.value.leaving_timestamp = data.leaving_timestamp;
-        spot.value.cost_per_hour = data.cost_per_hour;
+        user_id.value = data.user_id;
+        vehicle_number.value = data.vehicle_number;
+        parking_timestamp.value = data.parking_timestamp;
+        cost_per_hour.value = data.cost_per_hour;
     } catch (error) {
         console.error('Error fetching spot details:', error);
     }

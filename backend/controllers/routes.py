@@ -194,6 +194,7 @@ class viewspots(Resource):
             return make_response(jsonify({'message': 'Spot not found'}), 404)
         if spot.status != 'A':
             return make_response(jsonify({'message': 'Spot is not available'}), 400)
+        spot.parking_lot.total_spots -= 1
         db.session.delete(spot)
         db.session.commit()
         return make_response(jsonify({'message': 'Spot deleted successfully'}), 200)
@@ -471,3 +472,57 @@ class userchart(Resource):
             'lot_reservations_data': lot_reservations_data
         }
         return make_response(jsonify(result), 200)
+    
+class adminsearch(Resource):
+    @auth_token_required
+    @roles_required('admin')
+    def get(self,search,search_type):
+        results = []
+        if search_type == 'location' or search_type == 'pincode':
+            if search_type == 'location':
+                result = ParkingLot.query.filter_by(address=search).all()
+            else:
+                result = ParkingLot.query.filter_by(pin_code=search).all()
+            for r in result:
+                results.append({
+                    'id' : r.id,
+                    'address' : r.address,
+                    'availability' : ParkingSpot.query.filter_by(lot_id=r.id, status='A').count()
+                })
+            if results == []:
+                return make_response(jsonify({'message': 'No results found'}), 400)
+            
+            return make_response(jsonify(results), 200)
+        if search_type == 'available' or search_type == 'occupied':
+            if search_type == 'available':
+                result = ParkingSpot.query.filter_by(status='A').all()
+            else:
+                result = ParkingSpot.query.filter_by(status='O').all()
+            for r in result:
+                results.append({
+                    'id' : r.id,
+                    'status' : r.status,
+                    'lot_name': r.parking_lot.prime_location_name,
+                    'price' : r.parking_lot.price_per_hour
+                })
+            if results == []:
+                return make_response(jsonify({'message': 'No results found'}), 400)
+            return make_response(jsonify(results), 200)
+        if search_type == 'username' or search_type == 'email':
+            if search_type == 'username':
+                result = User.query.filter_by(name=search).all()
+            else:
+                result = User.query.filter_by(email=search).all()
+            for r in result:
+                results.append({
+                    'id' : r.id,
+                    'name' : r.name,
+                    'email' : r.email,
+                    'frequency' : Reservation.query.filter_by(user_id=r.id).count()
+                })
+            if results == []:
+                return make_response(jsonify({'message': 'No results found'}), 400)
+            return make_response(jsonify(results), 200)
+        else:
+            return make_response(jsonify({'message': 'Invalid search type'}), 400)
+        

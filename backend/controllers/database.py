@@ -28,7 +28,7 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
-    reservations = db.relationship('Reservation', backref='user', lazy=True)
+    reservations = db.relationship('Reservation', backref='user', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -51,7 +51,7 @@ class ParkingSpot(db.Model):
     lot_id = db.Column(db.Integer, db.ForeignKey('parking_lot.id'), nullable=False)
     status = db.Column(db.String(1), default='A', nullable=False) # 'A' for Available, 'O' for Occupied
 
-    reservations = db.relationship('Reservation', backref='parking_spot', lazy=True)
+    reservations = db.relationship('Reservation', backref='parking_spot', lazy=True, cascade="all, delete-orphan")
 
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)

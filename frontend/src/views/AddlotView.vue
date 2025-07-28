@@ -24,7 +24,7 @@
             </div>
             <div>
                 <button type="submit" class="btn btn-primary">Add Lot</button>
-                <button type="reset" @click="router.push('/admin-dashboard')" class="btn btn-secondary">Cancel</button>
+                <a class="btn btn-outline-primary m-1" @click="router.push('/admin-dashboard')" role="View">Cancel</a>
             </div>
         </form>
     </div>

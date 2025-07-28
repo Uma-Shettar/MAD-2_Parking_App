@@ -3,3 +3,4 @@ flask_sqlalchemy
 flask_security_too
 flask_restful
 flask-cors
+celery

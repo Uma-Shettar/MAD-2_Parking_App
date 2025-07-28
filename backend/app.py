@@ -35,6 +35,7 @@ def create_app():
     api.add_resource(records, '/parkingrecords')
     api.add_resource(adminchart, '/adminchart')
     api.add_resource(userchart, '/userchart')
+    api.add_resource(adminsearch, '/adminsearch/<string:search>/<string:search_type>')
 
     with app.app_context():
         db.create_all()

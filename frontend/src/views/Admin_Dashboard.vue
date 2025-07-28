@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid row justify-content-center">
-        <h3 class="text-center" style="color: rgb(114, 162, 250);">Welcome to the Admin Dashboard</h3>
+        <h3 class="text-center" style="color: #07567d;">Welcome to the Admin Dashboard</h3>
         <div class="container-fluid row justify-content-center">
             <div v-for="lot in lots" :key="lot.id" class="col-12 col-sm-12 col-md-6 col-lg-3">
                 <div class="card border-primary m-3 mt-5">
@@ -74,7 +74,7 @@ const editLot = (id) => {
 };
 
 const deleteLot = async (id) => {
-    if (confirm('Are you sure you want to delete this lot?')) {
+    if(confirm('Are you sure you want to delete this lot?'))
         try {
             const response = await fetch(`http://127.0.0.1:5000/api/lots/${id}`, {
                 method: 'DELETE',
@@ -92,7 +92,9 @@ const deleteLot = async (id) => {
         } catch (error) {
             console.error('Error deleting lot:', error);
         }
-    }
+    else
+        console.log('Deletion cancelled');
+
 };
 
 const viewSpot = (spotId) => {

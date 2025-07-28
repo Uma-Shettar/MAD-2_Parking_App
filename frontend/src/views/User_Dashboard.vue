@@ -27,9 +27,9 @@
                             <td>{{ reservation.vehicle_number }}</td>
                             <td>{{ formatDate(reservation.parking_timestamp) }} </td>
                             <td>{{ formatTime(reservation.parking_timestamp) }}</td>
-                            <td>{{ reservation.leaving_timestamp ? formatDate(reservation.leaving_timestamp) : 'N/A' }} </td>
-                            <td>{{ reservation.leaving_timestamp ? formatTime(reservation.leaving_timestamp) : 'N/A' }}</td>
-                            <td>{{ CalculatedDuration(reservation.parking_timestamp, reservation.leaving_timestamp) }}</td>
+                            <td>{{ reservation.leaving_timestamp ? formatDate(reservation.leaving_timestamp) : '---' }} </td>
+                            <td>{{ reservation.leaving_timestamp ? formatTime(reservation.leaving_timestamp) : '---' }}</td>
+                            <td>{{ reservation.leaving_timestamp ?CalculatedDuration(reservation.parking_timestamp, reservation.leaving_timestamp): '---' }}</td>
                             <td>
                                 <a class="btn btn-outline-primary" v-if="reservation.leaving_timestamp == None" @click="Release(reservation.id)" role="button" > Release </a>
                                 <a class="btn btn-outline-primary" v-else role="button" @click="Viewdetails(reservation.id)" > View Details </a>
@@ -41,7 +41,7 @@
         </div>
     </div>
     <hr style="border: 1px solid #000; width: 100%; margin: 20px auto;">
-<h3 class="text-center" style="color: rgb(114, 162, 250);">Search Parking Spot</h3>
+<h3 class="text-center" style="color: #07567d;">Search Parking Spot</h3>
 <form class = "d-flex" role="search" @submit.prevent="SearchLot">
     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" v-model="search">
     <select class="form-select me-2" aria-label="Default select example" name="search_type" v-model="search_type">

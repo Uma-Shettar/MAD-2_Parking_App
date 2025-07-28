@@ -1,5 +1,5 @@
 <template>
-    <h3 class="text-center" style="color: rgb(114, 162, 250);"> Summary </h3>
+    <h3 class="text-center" style="color: #07567d;"> Summary </h3>
 
     <div class="row m-5">
         <div class="col-md-6">
