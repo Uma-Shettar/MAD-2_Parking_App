@@ -1,5 +1,5 @@
-# mad2_parking_app_24f2000817
-Vehicle Parking App - is a multi-user web application to manage 4-wheeler parking. Admins can create  
+# MAD-2_Parking_App
+ It is a multi-user web application to manage 4-wheeler parking. Admins can create  
 and manage parking lots and monitor all user activity. Users can register, book, and release  
 spots. 
 
